@@ -1,0 +1,69 @@
+name: 'TF Pull Request Checker'
+on:
+  - pull_request
+ # pull_request:
+ #   paths: 'IaC/terraform/**'
+    
+env: 
+  workingDir: './IaC/terraform/'
+  
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: 'install hcl v2 and tf config inspect'
+        run: |
+          sudo go get github.com/hashicorp/hcl/v2 
+          sudo go get github.com/hashicorp/terraform-config-inspect
+        working-directory: /usr/local/go1.14/src/
+        
+      - name: 'show all of terraform config'
+        run: ~/go/bin/terraform-config-inspect --json
+        working-directory: ${{ env.workingDir }}
+
+      - name: 'parse out terraform version' # this strips out the = space and tabs 
+        run: ~/go/bin/terraform-config-inspect --json | jq -r ".required_core[0]" | echo "##[set-env name=tf_ver;]$(sed -E 's/[= \t]//g')"
+        working-directory: ${{ env.workingDir }}
+  
+      - name: SEB rule that terraform version must not use constraint operators
+        uses: MeilCli/test-command-action@v2
+        with:
+          command: echo ${{ env.tf_ver }}
+          expect_regex: "^[\\=]?([0-9]{1,2}\\.){2}([0-9]{1,2})\\b"
+          
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v1.0.1
+        with:
+          terraform_version: ${{ env.tf_ver }}
+ 
+      - name: Terraform Init
+        run: terraform init
+        # run: terraform init -backend-config access_key=${{ secrets.AZ_SA_KEY }}
+        working-directory: ${{ env.workingDir }}
+      
+    #   - id: azcreds
+    #     uses: gr2m/get-json-paths-action@v1.x
+    #     with:
+    #       json: ${{ secrets.AZURE_CLIENT_CREDENTIALS }} # this secret has our teamcity deployer creds in it
+    #       clientId: "clientId"
+    #       subscriptionId: "subscriptionId"
+    #       tenantId: "tenantId"
+     
+      - name: Terraform Format
+        run: terraform fmt
+        working-directory: ${{ env.workingDir }}
+      
+      - uses: stefanzweifel/git-auto-commit-action@v4.2.0
+        with:
+          commit_message: 'update with terraform format'
+              
+      - name: Terraform Plan
+        run: terraform plan -no-color 
+        id: tfplan
+        working-directory: ${{ env.workingDir }}

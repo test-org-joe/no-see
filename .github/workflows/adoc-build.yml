@@ -14,7 +14,7 @@ jobs:
       id: adocbuild
       uses: tonynv/asciidoctor-action@v1
       with:
-          program: "asciidoctor -D docs --backend=html5 -o index.html readme.adoc"
+          program: "asciidoctor -D docs --backend=html5 -o index.html README.adoc"
     - name: Print execution time
       run: echo "Time ${{ steps.adocbuild.outputs.time }}"
       

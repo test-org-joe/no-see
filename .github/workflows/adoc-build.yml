@@ -16,9 +16,16 @@ jobs:
       with:
           program: "asciidoctor -D docs --backend=html5 -o index.html README.adoc"
     - name: Print execution time
-      run: echo "Time ${{ steps.adocbuild.outputs.time }}"
+      run: cat index.html
     - name: stage changed files
       run: git add .
     - name: commit changed files
-      run: git commit -m "Auto updating docs"
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -m "Auto updating docs"
+    - name: fetch from master
+      run: git fetch origin master
+    - name: push code to master
+      run: git push origin HEAD:master
       

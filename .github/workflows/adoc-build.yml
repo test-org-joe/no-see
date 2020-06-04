@@ -16,7 +16,7 @@ jobs:
       with:
           program: "asciidoctor -D docs --backend=html5 -o index.html README.adoc"
     - name: Print execution time
-      run: cat index.html
+      run: ls
     - name: stage changed files
       run: git add .
     - name: commit changed files

@@ -3,3 +3,8 @@
 == h2
 
 === h3
+
+[%header,format=csv]
+|===
+include::test.csv[]
+|===

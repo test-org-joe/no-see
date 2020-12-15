@@ -12,7 +12,7 @@ jobs:
     - name: adoc to xml
       uses: tonynv/asciidoctor-action@v1
       with:
-          program: "asciidoc -b docbook README.adoc"
+          program: "asciidoctor -b docbook README.adoc"
     - name: pandoc
       uses: docker://pandoc/core:2.9
       with:

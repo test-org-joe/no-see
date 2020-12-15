@@ -10,6 +10,14 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+    - name: adoc to xml
+      uses: tonynv/asciidoctor-action@v1
+      with:
+          program: "asciidoc -b docbook README.adoc"
+    - name: pandoc
+    - uses: docker://pandoc/core:2.9
+      with:
+          args: "-f docbook -t markdown_strict README.xml README.adoc -o README.xml" # gets appended to pandoc command
     - name: Get build container
       id: adocbuild
       uses: tonynv/asciidoctor-action@v1

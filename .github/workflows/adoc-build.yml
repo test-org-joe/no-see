@@ -12,11 +12,11 @@ jobs:
     - name: adoc to xml
       uses: tonynv/asciidoctor-action@v1
       with:
-          program: "asciidoctor -b docbook README.adoc"
+          program: "asciidoctor -b docbook test.adoc"
     - name: pandoc
       uses: docker://pandoc/core:2.9
       with:
-          args: "-f docbook -t markdown_strict README.xml README.adoc -o README.xml" # gets appended to pandoc command
+          args: "-f docbook -t markdown_strict test.xml README.adoc -o test.md" # gets appended to pandoc command
     - name: Get build container
       id: adocbuild
       uses: tonynv/asciidoctor-action@v1
